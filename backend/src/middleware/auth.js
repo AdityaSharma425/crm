@@ -9,6 +9,7 @@ passport.use(new GoogleStrategy({
   callbackURL: process.env.NODE_ENV === 'production' 
     ? process.env.GOOGLE_CALLBACK_URL 
     : 'http://localhost:3001/api/auth/google/callback', 
+  scope: ['profile', 'email'],
   proxy: true
 }, async (accessToken, refreshToken, profile, done) => {
   try {
