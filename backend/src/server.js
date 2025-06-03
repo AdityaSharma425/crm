@@ -44,20 +44,29 @@ app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Passport middleware
+// Session middleware (should be before passport middleware)
+app.use(session({
+  store: new RedisStore({ client: redisClient }),
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined,
+    path: '/'
+  }
+}));
+
+// Passport middleware (should be after session middleware)
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Swagger documentation
 const swaggerDocument = YAML.load('./swagger.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-// Session middleware
-app.use(session({
-  store: new RedisStore({ client: redisClient, session: session }),
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
-  path: '/'
-}));
 
 // Routes
 app.use('/api/dashboard', require('./routes/dashboard'));
