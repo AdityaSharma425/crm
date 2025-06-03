@@ -1,3 +1,5 @@
+"use client";
+
 import { customers } from '@/lib/api';
 import { useState } from 'react';
 import { toast } from 'sonner';
