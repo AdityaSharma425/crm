@@ -1,7 +1,7 @@
 const config = {
-  apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:3001',
-  googleClientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-  environment: process.env.REACT_APP_ENV || 'development',
+  apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+  googleClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+  environment: process.env.NEXT_PUBLIC_ENV || 'development',
   
   // API endpoints
   endpoints: {
@@ -27,7 +27,7 @@ const config = {
 };
 
 // Validate required environment variables
-const requiredEnvVars = ['REACT_APP_API_URL', 'REACT_APP_GOOGLE_CLIENT_ID'];
+const requiredEnvVars = ['NEXT_PUBLIC_API_URL', 'NEXT_PUBLIC_GOOGLE_CLIENT_ID'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
@@ -35,6 +35,7 @@ if (missingEnvVars.length > 0) {
 }
 
 // Log the API URL in development
+// Note: In Next.js, NODE_ENV is typically determined at build time
 if (process.env.NODE_ENV === 'development') {
   console.log('API URL:', config.apiUrl);
 }
