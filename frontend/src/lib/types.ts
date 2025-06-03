@@ -27,16 +27,18 @@ export interface Rule {
   value: string | number;
 }
 
+export type CampaignStatus = 'draft' | 'scheduled' | 'running' | 'completed' | 'failed';
+
 export interface Campaign {
   _id: string;
   name: string;
   description: string;
+  status: CampaignStatus;
   segment: string | Segment;
   message: string;
-  status: 'draft' | 'scheduled' | 'running' | 'completed' | 'failed';
-  scheduledFor?: string;
-  createdAt: string;
-  updatedAt: string;
+  scheduledFor?: Date;
+  createdAt: Date;
+  updatedAt: Date;
   stats?: {
     totalAudience: number;
     sent: number;

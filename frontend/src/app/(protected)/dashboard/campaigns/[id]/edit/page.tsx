@@ -222,15 +222,15 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
                     Current Status
                   </label>
                   <div className="mt-1">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                       campaign.status === 'draft' ? 'bg-gray-100 text-gray-800' :
                       campaign.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
-                      campaign.status === 'active' ? 'bg-green-100 text-green-800' :
+                      campaign.status === 'running' ? 'bg-green-100 text-green-800' :
                       campaign.status === 'completed' ? 'bg-purple-100 text-purple-800' :
                       'bg-red-100 text-red-800'
                     }`}>
                       {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
-                    </span>
+                    </div>
                   </div>
                 </div>
               </div>
