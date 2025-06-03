@@ -10,10 +10,9 @@ const session = require('express-session');
 require('dotenv').config();
 const { startScheduler } = require('./services/schedulerService');
 const batchProcessor = require('./services/batchProcessor');
-const { redisClient } = require('./config/redis');
 
-// Configure Redis store for sessions
-const RedisStore = require('connect-redis').RedisStore;
+// Configure MongoDB store for sessions
+const MongoStore = require('connect-mongo');
 
 // Initialize express app
 const app = express();
@@ -46,7 +45,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Session middleware (should be before passport middleware)
 app.use(session({
-  store: new RedisStore({ client: redisClient }),
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    ttl: 24 * 60 * 60 // 24 hours
+  }),
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
