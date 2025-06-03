@@ -13,6 +13,12 @@ const batchProcessor = require('./services/batchProcessor');
 const { redisClient } = require('./config/redis');
 
 // Configure Redis store for sessions
+console.log('Debugging connect-redis require:');
+console.log('Type of require(\'connect-redis\'):', typeof require('connect-redis'));
+console.log('Value of require(\'connect-redis\'):', require('connect-redis'));
+console.log('Keys of require(\'connect-redis\'):', Object.keys(require('connect-redis')));
+console.log('Value of require(\'connect-redis\').default:', require('connect-redis').default);
+
 const RedisStore = require('connect-redis')(session);
 
 // Initialize express app
