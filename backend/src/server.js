@@ -9,7 +9,6 @@ const passport = require('passport');
 const session = require('express-session');
 require('dotenv').config();
 const { startScheduler } = require('./services/schedulerService');
-const { connectRedis } = require('./config/redis');
 const batchProcessor = require('./services/batchProcessor');
 
 // Initialize express app
@@ -26,7 +25,8 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['set-cookie']
 }));
 
 // Rate limiting
@@ -48,8 +48,9 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined
   }
 }));
 
@@ -85,21 +86,26 @@ const initializeServer = async () => {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
 
-    // Connect to Redis
-    await connectRedis();
-    console.log('Redis connection established successfully');
-
     // Start batch processor
     batchProcessor.start();
     console.log('Batch processor started');
 
     // Start server
     const PORT = process.env.PORT || 3001;
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+    const server = app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
       // Start the campaign scheduler
       startScheduler();
+    }).on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Please try a different port or kill the process using this port.`);
+        process.exit(1);
+      } else {
+        console.error('Server error:', err);
+        process.exit(1);
+      }
     });
+
   } catch (error) {
     console.error('Failed to initialize server:', error);
     process.exit(1);

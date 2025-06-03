@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL + '/api',
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -22,7 +22,7 @@ api.interceptors.response.use(
 
 // Auth API calls
 export const auth = {
-  login: () => window.location.href = process.env.NEXT_PUBLIC_BACKEND_URL + '/api/auth/google',
+  login: () => window.location.href = '/api/auth/google',
   logout: () => api.post('/auth/logout'),
   getCurrentUser: () => api.get('/auth/me'),
 };

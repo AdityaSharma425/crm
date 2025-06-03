@@ -1,42 +1,24 @@
-const Redis = require('redis');
+const Redis = require('ioredis');
 
-// Create Redis client with proper configuration
-const redisClient = Redis.createClient({
-  url: process.env.REDIS_URL,
-  socket: {
-    reconnectStrategy: (retries) => {
-      if (retries > 10) {
-        console.error('Redis connection lost. Max retries reached.');
-        return new Error('Redis max retries reached');
-      }
-      return Math.min(retries * 100, 3000);
-    },
-    tls: process.env.NODE_ENV === 'production' ? {
-      rejectUnauthorized: false // Required for Redis Cloud
-    } : undefined
-  }
+const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+  retryStrategy: (times) => {
+    const delay = Math.min(times * 50, 2000);
+    return delay;
+  },
+  maxRetriesPerRequest: 3
 });
 
-// Connect to Redis
-const connectRedis = async () => {
-  try {
-    if (!redisClient.isOpen) {
-      await redisClient.connect();
-      console.log('Connected to Redis');
-    }
-  } catch (error) {
-    console.error('Redis connection error:', error);
-    throw error; // Throw error to handle it in the server initialization
-  }
-};
+redisClient.on('connect', () => {
+  console.log('Connected to Redis');
+});
+
+redisClient.on('error', (err) => {
+  console.error('Redis connection error:', err);
+});
 
 // Publish message to a channel
 const publishToChannel = async (channel, message) => {
   try {
-    if (!redisClient.isOpen) {
-      console.log('Redis client not connected, attempting to reconnect...');
-      await connectRedis();
-    }
     await redisClient.publish(channel, JSON.stringify(message));
     console.log(`Published message to channel ${channel}:`, message);
   } catch (error) {
@@ -45,18 +27,11 @@ const publishToChannel = async (channel, message) => {
   }
 };
 
-// Handle Redis errors
-redisClient.on('error', (err) => {
-  console.error('Redis Client Error:', err);
-});
-
 // Create Redis subscriber
 const subscriber = redisClient.duplicate();
-subscriber.connect().catch(console.error);
 
 // Create Redis publisher
 const publisher = redisClient.duplicate();
-publisher.connect().catch(console.error);
 
 // Subscribe to channels
 const subscribeToChannel = async (channel, callback) => {
@@ -73,7 +48,6 @@ module.exports = {
   redisClient,
   subscriber,
   publisher,
-  connectRedis,
   publishToChannel,
   subscribeToChannel
 }; 
