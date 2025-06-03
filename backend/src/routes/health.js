@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const redisClient = require('../config/redis');
+const { redisClient } = require('../config/redis');
 
 // Health check endpoint
 router.get('/health', async (req, res) => {
