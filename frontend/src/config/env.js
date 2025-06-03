@@ -1,5 +1,5 @@
 const config = {
-  apiUrl: process.env.REACT_APP_API_URL,
+  apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:3001',
   googleClientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
   environment: process.env.REACT_APP_ENV || 'development',
   
@@ -31,6 +31,11 @@ const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
   console.error('Missing required environment variables:', missingEnvVars);
+}
+
+// Log the API URL in development
+if (process.env.NODE_ENV === 'development') {
+  console.log('API URL:', config.apiUrl);
 }
 
 export default config; 
