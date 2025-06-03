@@ -31,7 +31,7 @@ const requiredEnvVars = ['NEXT_PUBLIC_API_URL', 'NEXT_PUBLIC_GOOGLE_CLIENT_ID'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
-  console.error('Missing required environment variables:', missingEnvVars);
+  console.error('Missing required environment variables (check Vercel settings):', missingEnvVars.join(', '));
 }
 
 // Log the API URL in development
