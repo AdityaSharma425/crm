@@ -10,6 +10,7 @@ const session = require('express-session');
 require('dotenv').config();
 const { startScheduler } = require('./services/schedulerService');
 const batchProcessor = require('./services/batchProcessor');
+const { redisClient } = require('./config/redis');
 
 // Initialize express app
 const app = express();
@@ -40,8 +41,12 @@ app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Configure Redis store for sessions
+const RedisStore = require('connect-redis')(session);
+
 // Session middleware
 app.use(session({
+  store: new RedisStore({ client: redisClient }),
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
