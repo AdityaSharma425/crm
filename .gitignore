@@ -1,0 +1,27 @@
+# Environment variables
+.env
+
+# Dependency directories
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Build output directories
+.next/
+frontend/.next/
+backend/dist/ # If your backend has a build step creating a dist folder
+
+# Log files
+*.log
+logs/
+
+# IDE specific files (example for VS Code)
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*~

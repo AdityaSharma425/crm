@@ -1,0 +1,353 @@
+openapi: 3.0.0
+info:
+  title: Mini CRM Platform API
+  version: 1.0.0
+  description: API documentation for the Mini CRM Platform
+
+servers:
+  - url: http://localhost:3001
+    description: Local development server
+
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: connect.sid
+      description: Session cookie for authentication
+
+paths:
+  /api/auth/google:
+    get:
+      summary: Initiate Google OAuth login
+      tags: [Authentication]
+      responses:
+        '302':
+          description: Redirect to Google login page
+
+  /api/auth/me:
+    get:
+      summary: Get current user information
+      tags: [Authentication]
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Current user information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  picture:
+                    type: string
+                  role:
+                    type: string
+                    enum: [user, admin]
+
+  /api/customers:
+    get:
+      summary: Get all customers
+      tags: [Customers]
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+    
+    post:
+      summary: Create a new customer
+      tags: [Customers]
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+      responses:
+        '201':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+  /api/segments:
+    get:
+      summary: Get all segments
+      tags: [Segments]
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: List of segments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Segment'
+    
+    post:
+      summary: Create a new segment
+      tags: [Segments]
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentInput'
+      responses:
+        '201':
+          description: Segment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Segment'
+
+  /api/segments/preview:
+    post:
+      summary: Preview segment size and matching customers
+      tags: [Segments]
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentInput'
+      responses:
+        '200':
+          description: Segment preview results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCustomers:
+                    type: number
+                  matchingCustomers:
+                    type: number
+                  preview:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Customer'
+
+  /api/campaigns:
+    get:
+      summary: Get all campaigns
+      tags: [Campaigns]
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: List of campaigns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Campaign'
+    
+    post:
+      summary: Create a new campaign
+      tags: [Campaigns]
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CampaignInput'
+      responses:
+        '201':
+          description: Campaign created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        totalSpent:
+          type: number
+        visitCount:
+          type: number
+        lastVisit:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CustomerInput:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        totalSpent:
+          type: number
+        visitCount:
+          type: number
+        tags:
+          type: array
+          items:
+            type: string
+
+    Segment:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        rules:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              operator:
+                type: string
+                enum: [equals, not_equals, contains, not_contains, greater_than, less_than, between]
+              value:
+                type: object
+        ruleLogic:
+          type: string
+          enum: [AND, OR]
+        customerCount:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SegmentInput:
+      type: object
+      required:
+        - name
+        - rules
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        rules:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              operator:
+                type: string
+                enum: [equals, not_equals, contains, not_contains, greater_than, less_than, between]
+              value:
+                type: object
+        ruleLogic:
+          type: string
+          enum: [AND, OR]
+
+    Campaign:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        segment:
+          $ref: '#/components/schemas/Segment'
+        message:
+          type: string
+        status:
+          type: string
+          enum: [draft, scheduled, running, completed, failed]
+        scheduleTime:
+          type: string
+          format: date-time
+        stats:
+          type: object
+          properties:
+            totalAudience:
+              type: number
+            sent:
+              type: number
+            failed:
+              type: number
+            delivered:
+              type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CampaignInput:
+      type: object
+      required:
+        - name
+        - segment
+        - message
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        segment:
+          type: string
+        message:
+          type: string
+        scheduleTime:
+          type: string
+          format: date-time 
