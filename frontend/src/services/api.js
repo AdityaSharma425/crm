@@ -64,7 +64,11 @@ api.interceptors.response.use(
 export const authAPI = {
   login: (credentials) => api.post(config.endpoints.auth.login, credentials),
   register: (userData) => api.post(config.endpoints.auth.register, userData),
-  googleLogin: () => api.get(config.endpoints.auth.google),
+  googleLogin: () => {
+    // Redirect to backend Google OAuth endpoint
+    window.location.href = `${config.apiUrl}${config.endpoints.auth.google}`;
+  },
+  handleGoogleCallback: (code) => api.get(`${config.endpoints.auth.googleCallback}?code=${code}`),
   logout: () => api.post(config.endpoints.auth.logout)
 };
 

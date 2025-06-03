@@ -9,6 +9,7 @@ const config = {
       login: '/api/auth/login',
       register: '/api/auth/register',
       google: '/api/auth/google',
+      googleCallback: '/api/auth/google/callback',
       logout: '/api/auth/logout'
     },
     customers: '/api/customers',
