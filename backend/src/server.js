@@ -12,6 +12,10 @@ const { startScheduler } = require('./services/schedulerService');
 const batchProcessor = require('./services/batchProcessor');
 const { redisClient } = require('./config/redis');
 
+// Configure Redis store for sessions
+const connectRedis = require('connect-redis');
+const RedisStore = connectRedis.createClient(session);
+
 // Initialize express app
 const app = express();
 
@@ -40,25 +44,6 @@ app.use(limiter);
 // Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Configure Redis store for sessions
-const RedisStore = require('connect-redis')(session);
-
-// Session middleware
-app.use(session({
-  store: new RedisStore({ client: redisClient }),
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined,
-    path: '/'
-  }
-}));
 
 // Passport middleware
 app.use(passport.initialize());
