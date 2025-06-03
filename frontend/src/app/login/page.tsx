@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import { auth } from '@/lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      window.location.href = '/api/auth/google';
+      auth.login();
     } catch (error) {
       toast.error('Failed to initiate Google login');
       setIsLoading(false);

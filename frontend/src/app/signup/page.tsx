@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 import { CheckIcon } from '@heroicons/react/24/outline';
+import { auth } from '@/lib/api';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -43,7 +44,7 @@ export default function SignupPage() {
   const handleGoogleSignup = async () => {
     try {
       setIsLoading(true);
-      window.location.href = '/api/auth/google';
+      auth.login();
     } catch (error) {
       toast.error('Failed to initiate Google signup');
       setIsLoading(false);
