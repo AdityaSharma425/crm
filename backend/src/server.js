@@ -50,7 +50,8 @@ app.use(session({
     httpOnly: true,
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined
+    domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined,
+    path: '/'
   }
 }));
 
@@ -68,6 +69,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/customers', require('./routes/customers'));
 app.use('/api/campaigns', require('./routes/campaigns'));
 app.use('/api/segments', require('./routes/segments'));
+app.use('/api', require('./routes/health'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
