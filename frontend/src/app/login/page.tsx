@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import { authAPI } from '@/services/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,21 +16,30 @@ export default function LoginPage() {
         const response = await fetch('/api/auth/me');
         if (response.ok) {
           router.push('/dashboard');
+        } else {
+          // Handle cases where /api/auth/me returns not ok (e.g., 401)
+          // Depending on backend, might need to clear local storage/cookies
         }
       } catch (error) {
         // User is not logged in, stay on login page
+        // console.error('Auth check failed:', error);
       }
     };
 
+    // Basic check on mount - consider more robust methods for production
     checkAuth();
   }, [router]);
 
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      window.location.href = '/api/auth/google';
+      // Use the authAPI function to redirect to the backend's Google auth URL
+      authAPI.googleLogin();
+      // Note: The line below will not be reached as window.location.href changes the page
+      // setIsLoading(false);
     } catch (error) {
       toast.error('Failed to initiate Google login');
+      console.error('Google login initiation error:', error);
       setIsLoading(false);
     }
   };
