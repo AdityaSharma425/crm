@@ -13,7 +13,7 @@ const batchProcessor = require('./services/batchProcessor');
 const { redisClient } = require('./config/redis');
 
 // Configure Redis store for sessions
-const RedisStore = require('connect-redis').default;
+const RedisStore = require('connect-redis')(session);
 
 // Initialize express app
 const app = express();
@@ -54,7 +54,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Session middleware
 app.use(session({
-  store: new RedisStore({ client: redisClient, session: session }),
+  store: new RedisStore({ client: redisClient }),
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   path: '/'
 }));
